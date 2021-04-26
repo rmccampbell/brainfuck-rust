@@ -1,9 +1,10 @@
+use main_error::MainError;
 use std::error::Error;
-use std::fmt;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use structopt::StructOpt;
+use thiserror::Error;
 
 #[derive(StructOpt, Debug)]
 struct Opt {
@@ -30,19 +31,13 @@ enum BfOp {
     RBracket(usize),
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Error)]
 enum ParseError {
+    #[error("Invalid brainfuck syntax: unmatched left bracket")]
     UnmatchedLeftBracket,
+    #[error("Invalid brainfuck syntax: unmatched right bracket")]
     UnmatchedRightBracket,
 }
-
-impl fmt::Display for ParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "invalid brainfuck syntax: {:?}", self)
-    }
-}
-
-impl Error for ParseError {}
 
 use BfOp::*;
 use ParseError::*;
@@ -121,7 +116,7 @@ fn run(code: &str, opts: &Opt) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), MainError> {
     let opt = Opt::from_args();
     let mut code = String::new();
     if let Some(cmd) = &opt.command {
@@ -136,7 +131,3 @@ fn main() -> Result<(), Box<dyn Error>> {
     run(&code, &opt)?;
     Ok(())
 }
-
-// fn main() {
-//     main_().unwrap_or_else(|e| eprintln!("Error: {}", e));
-// }
