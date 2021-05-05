@@ -1,5 +1,4 @@
-use main_error::MainError;
-use std::error::Error;
+use anyhow::Error;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
@@ -75,7 +74,7 @@ fn parse(code: &str) -> Result<Vec<BfOp>, ParseError> {
     Ok(instrs)
 }
 
-fn run(code: &str, opts: &Opt) -> Result<(), Box<dyn Error>> {
+fn run(code: &str, opts: &Opt) -> Result<(), Error> {
     let instrs = parse(code)?;
     if opts.debug {
         println!("{:?}", instrs);
@@ -116,7 +115,7 @@ fn run(code: &str, opts: &Opt) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn main() -> Result<(), MainError> {
+fn main() -> Result<(), Error> {
     let opt = Opt::from_args();
     let mut code = String::new();
     if let Some(cmd) = &opt.command {
