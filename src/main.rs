@@ -32,10 +32,18 @@ enum BfOp {
 
 #[derive(Debug, Copy, Clone, Error)]
 enum ParseError {
-    #[error("Invalid brainfuck syntax: unmatched left bracket")]
+    #[error("Unmatched left bracket")]
     UnmatchedLeftBracket,
-    #[error("Invalid brainfuck syntax: unmatched right bracket")]
+    #[error("Unmatched right bracket")]
     UnmatchedRightBracket,
+}
+
+#[derive(Debug, Error)]
+enum BfError {
+    #[error("Invalid brainfuck syntax: {0}")]
+    ParseError(#[from] ParseError),
+    #[error("Runtime error: {0}")]
+    RuntimeError(#[from] io::Error),
 }
 
 use BfOp::*;
@@ -74,7 +82,7 @@ fn parse(code: &str) -> Result<Vec<BfOp>, ParseError> {
     Ok(instrs)
 }
 
-fn run(code: &str, opts: &Opt) -> Result<(), Error> {
+fn run(code: &str, opts: &Opt) -> Result<(), BfError> {
     let instrs = parse(code)?;
     if opts.debug {
         println!("{:?}", instrs);
