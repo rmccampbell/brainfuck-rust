@@ -87,10 +87,8 @@ fn run(code: &str, opts: &Opt) -> Result<(), BfError> {
     if opts.debug {
         println!("{:?}", instrs);
     }
-    let stdout = io::stdout();
-    let stdin = io::stdin();
-    let mut stdout = stdout.lock();
-    let mut stdin = stdin.lock();
+    let mut stdout = io::stdout().lock();
+    let mut stdin = io::stdin().lock();
     let mut tape = [0u8; 1 << 16];
     let mut pc = 0;
     let mut ptr = 0;
